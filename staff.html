@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Oven board · Apprentice Cafe</title>
+<meta name="theme-color" content="#414042">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Oven board">
+<style>
+:root{--ink:#414042;--ink-2:#2f2e30;--cream:#ffefcf;--paper:#f6efe3;--line:#e3d9c7;--muted:#7a7470;--ember:#d8702a;--ok:#2f7d4f;--bad:#b4362f;--card:#ffffff}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+header.top{background:var(--ink);color:var(--cream);padding:calc(18px + env(safe-area-inset-top)) 20px 22px;text-align:center}
+header.top img{width:64px;height:64px;border-radius:16px;display:block;margin:0 auto 10px;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+header.top h1{margin:0;font-size:22px;font-weight:600;letter-spacing:.02em}
+header.top p{margin:6px 0 0;color:#d9d2c3;font-size:14px}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.card h2{margin:0 0 6px;font-size:17px}
+.card p{margin:6px 0;color:#4d4945}
+.muted{color:var(--muted);font-size:14px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:14px 18px;background:var(--ink);color:var(--cream);font-weight:600;width:100%;font-size:17px}
+button.secondary{background:#efe7d7;color:var(--ink)}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.danger{background:#f6e2df;color:var(--bad)}
+button:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.status{display:flex;align-items:center;gap:10px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:#bbb;flex:none}.dot.on{background:var(--ok)}.dot.off{background:#b9b2a7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;font-size:15px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.chip.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+ol.steps{padding-left:22px;margin:8px 0 0}ol.steps li{margin:6px 0}
+ul.feed{list-style:none;padding:0;margin:8px 0 0}ul.feed li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}ul.feed li:first-child{border-top:0}
+ul.feed .when{color:var(--muted);font-size:14px;white-space:nowrap}
+.msg{margin-top:10px;font-size:14px;color:var(--muted);min-height:1em}
+.msg.err{color:var(--bad)}.msg.ok{color:var(--ok)}
+a.link{color:var(--ink);font-weight:600}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 20px 30px}
+.hidden{display:none !important}
+.kbd{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;background:#fff;font-size:14px}
+
+.item{padding:14px 0;border-top:1px solid var(--line)}.item:first-child{border-top:0}
+.item .name{font-weight:600;font-size:17px;margin-bottom:10px}.item .name small{font-weight:400;color:var(--muted);font-size:12px;margin-left:8px;white-space:nowrap}
+.item .act{display:flex;gap:8px;align-items:stretch}
+.item input[type=number]{width:72px;flex:none;font:inherit;font-size:18px;text-align:center;padding:10px 4px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.item button{width:auto;padding:12px 14px;font-size:15px;white-space:nowrap}
+.item button.fresh{flex:1}
+.item button.so{flex:none;background:#efe7d7;color:var(--ink);padding:12px 12px}
+.log .meta span{white-space:nowrap}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet .inner{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:100%;max-width:520px}
+.sheet textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;resize:vertical;min-height:60px}
+.preview{background:var(--paper);border-radius:12px;padding:12px 14px;margin:10px 0}
+.preview b{display:block;margin-bottom:2px}
+.log li{display:block}.log .meta{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px;margin-top:2px}
+.pill{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px;background:#eee;color:#444;margin-left:6px}.pill.ok{background:#dff2e5;color:var(--ok)}.pill.bad{background:#f8e0dd;color:var(--bad)}.pill.warn{background:#fdebd2;color:#9a5a12}
+details summary{cursor:pointer;font-weight:600}
+.edit input[type=text]{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.edit .r{display:flex;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.edit .r:first-child{border-top:0}
+.edit select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;max-width:100%}
+.edit button{width:auto;padding:10px 12px;font-size:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Oven board</h1>
+  <p id="sub">Tap "Fresh batch" when something comes out. Customers get a notification with a link to order.</p>
+</header>
+<main>
+  <section class="card" id="gate">
+    <h2>Staff passcode</h2>
+    <p class="muted">Ask Rein for it. It's remembered on this device.</p>
+    <input id="pass" type="password" autocomplete="current-password" style="width:100%;font:inherit;font-size:18px;padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0 10px" placeholder="passcode">
+    <button id="enter">Enter</button>
+    <div class="msg" id="gateMsg"></div>
+  </section>
+
+  <div id="board" class="hidden">
+    <section class="card">
+      <div class="status"><span class="dot on"></span><span id="subs">… subscribers</span></div>
+      <p class="muted" id="squareState"></p>
+      <div id="items"></div>
+      <div class="msg" id="msg"></div>
+    </section>
+
+    <section class="card">
+      <h2>Recent</h2>
+      <ul class="feed log" id="log"><li class="muted">Loading…</li></ul>
+    </section>
+
+    <section class="card">
+      <h2>This phone</h2>
+      <p class="muted">Get the same alerts customers get, so you know they went out.</p>
+      <div class="row" style="margin-top:8px"><button class="secondary" id="meSub">Alerts on this phone</button><button class="ghost" id="meTest" disabled>Send me a test</button></div>
+      <div class="msg" id="meMsg"></div>
+    </section>
+
+    <section class="card">
+      <details>
+        <summary>Edit items</summary>
+        <p class="muted">Name reads after a number in the alert ("12 pumpkin loaves just came out"). The Square link is what the count updates; leave it blank for alert-only items.</p>
+        <div class="edit" id="edit"></div>
+        <div class="row" style="margin-top:10px"><button class="secondary" id="addItem">+ Add item</button><button class="ghost" id="loadSquare">Load Square items</button></div>
+        <div class="msg" id="editMsg"></div>
+      </details>
+    </section>
+    <p class="muted" style="text-align:center"><a class="link" id="customerLink" href="./">Customer sign-up page</a> · <a class="link" href="#" id="logout">Forget passcode</a></p>
+  </div>
+</main>
+<div id="sheet" class="sheet hidden"></div>
+<script>
+(function(){
+  var BASE = "./";
+  var API = "https://uzfaottkxdunmmimajey.supabase.co/functions/v1/fresh/";
+  var $ = function(id){ return document.getElementById(id); };
+  var key = null; try { key = localStorage.getItem('fresh_staff_key'); } catch(e){}
+  var items = [], overview = null, squareVariations = null, mySub = null, reg = null;
+  var supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+
+  function api(path, body, method){ return fetch(API + 'api/staff/' + path, { method: method || (body ? 'POST' : 'GET'), headers: { 'content-type': 'application/json', 'x-staff-key': key || '' }, body: body ? JSON.stringify(body) : undefined }).then(function(r){ return r.json().then(function(j){ if (!r.ok) { var e = new Error(j.error || ('HTTP ' + r.status)); e.status = r.status; throw e; } return j; }); }); }
+  function pub(path, body){ return fetch(API + 'api/' + path, body ? { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body) } : {}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error || ('HTTP ' + r.status)); return j; }); }); }
+  function ago(iso){ var d = (Date.now() - new Date(iso).getTime())/1000; if (d < 60) return 'just now'; if (d < 3600) return Math.round(d/60) + ' min ago'; if (d < 86400) return Math.round(d/3600) + ' h ago'; return new Date(iso).toLocaleDateString(undefined, {month:'short', day:'numeric'}); }
+  function setMsg(id, t, cls){ var m = $(id); m.textContent = t || ''; m.className = 'msg' + (cls ? ' ' + cls : ''); }
+  function b64ToU8(s){ var pad = '='.repeat((4 - s.length % 4) % 4); var b = (s + pad).replace(/-/g,'+').replace(/_/g,'/'); var raw = atob(b); var out = new Uint8Array(raw.length); for (var i=0;i<raw.length;i++) out[i] = raw.charCodeAt(i); return out; }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function previewText(it, qty){ return (qty ? qty + ' ' : '') + (qty ? it.name.charAt(0).toLowerCase() + it.name.slice(1) : it.name) + ' just came out of the oven at Apprentice. Tap to order for pickup.'; }
+
+  function renderItems(){
+    var box = $('items'); box.innerHTML = '';
+    items.filter(function(i){ return i.active; }).forEach(function(it){
+      var row = document.createElement('div'); row.className = 'item';
+      row.innerHTML = '<div class="name">' + esc(it.emoji ? it.emoji + ' ' : '') + esc(it.name) + '<small>' + (it.square_variation_id ? 'updates Square stock' : 'alert only') + '</small></div>' +
+        '<div class="act">' + (it.square_variation_id ? '<input type="number" inputmode="numeric" min="0" max="999" placeholder="qty" aria-label="quantity">' : '') +
+        '<button class="fresh">🔥 Fresh batch</button>' + (it.square_variation_id ? '<button class="so">Sold out</button>' : '') + '</div>';
+      var qtyEl = row.querySelector('input');
+      row.querySelector('.fresh').onclick = function(){ openSheet(it, qtyEl ? qtyEl.value : ''); };
+      var so = row.querySelector('.so'); if (so) so.onclick = function(){ if (confirm('Mark ' + it.name + ' sold out in Square (stock → 0)? Customers are not notified.')) soldOut(it); };
+      box.appendChild(row);
+    });
+    if (!box.children.length) box.innerHTML = '<p class="muted">No active items. Add some under "Edit items".</p>';
+  }
+
+  function openSheet(it, qty){
+    var q = parseInt(qty, 10); if (!(q >= 0)) q = null;
+    if (it.square_variation_id && q === null) { setMsg('msg', 'Enter how many ' + it.name.toLowerCase() + ' are on the shelf now (total, not just this batch) so Square stock is right.', 'err'); return; }
+    setMsg('msg', '');
+    var s = $('sheet'); s.classList.remove('hidden');
+    s.innerHTML = '<div class="inner"><h2 style="margin:0 0 4px">Send alert?</h2><p class="muted" style="margin:0">Goes to ' + (overview ? overview.subscribers : '…') + ' subscribed phones' + (it.square_variation_id ? ' and sets Square stock to ' + q : '') + '.</p>' +
+      '<div class="preview"><b>' + esc(it.emoji || '🔥') + ' Fresh out of the oven</b><span id="pv">' + esc(previewText(it, q)) + '</span></div>' +
+      '<textarea id="note" placeholder="Optional extra line, e.g. “Brown butter this week.”"></textarea>' +
+      '<div class="row" style="margin-top:12px"><button class="ghost" id="cancel">Cancel</button><button id="send">Send 🔥</button></div><div class="msg" id="sheetMsg"></div></div>';
+    $('cancel').onclick = function(){ s.classList.add('hidden'); };
+    $('send').onclick = function(){
+      $('send').disabled = true; setMsg('sheetMsg', 'Sending…');
+      api('alert', { item_id: it.id, quantity: q, note: $('note').value.trim() || null }).then(function(j){
+        s.classList.add('hidden');
+        setMsg('msg', 'Sent to ' + j.sent + (j.failed ? ' (' + j.failed + ' failed)' : '') + '. Square: ' + j.square_status, j.square_status.indexOf('error') === 0 ? 'err' : 'ok');
+        refresh();
+      }).catch(function(e){ setMsg('sheetMsg', e.message, 'err'); $('send').disabled = false; });
+    };
+  }
+
+  function soldOut(it){
+    setMsg('msg', 'Updating Square…');
+    api('soldout', { item_id: it.id }).then(function(j){ setMsg('msg', it.name + ': ' + j.square_status, j.square_status.indexOf('error') === 0 ? 'err' : 'ok'); refresh(); })
+    .catch(function(e){ setMsg('msg', e.message, 'err'); });
+  }
+
+  function renderLog(){
+    var l = $('log'); l.innerHTML = '';
+    if (!overview.alerts.length) { l.innerHTML = '<li class="muted">No alerts yet.</li>'; return; }
+    overview.alerts.forEach(function(a){
+      var li = document.createElement('li');
+      var sq = a.square_status || '';
+      var pill = sq ? '<span class="pill ' + (sq.indexOf('error') === 0 ? 'bad' : (sq === 'skipped' || sq.indexOf('no ') === 0 ? 'warn' : 'ok')) + '">' + esc(sq.length > 48 ? sq.slice(0, 48) + '…' : sq) + '</span>' : '';
+      li.innerHTML = '<div>' + esc(a.item_name) + (a.kind === 'sold_out' ? ' — sold out' : a.kind === 'test' ? ' — test' : (a.quantity != null ? ' × ' + a.quantity : '')) + pill + '</div>' +
+        '<div class="meta"><span>' + (a.kind === 'sold_out' ? 'no notification' : 'sent ' + a.sent + (a.failed ? ', failed ' + a.failed : '')) + '</span><span>' + ago(a.created_at) + '</span></div>';
+      l.appendChild(li);
+    });
+  }
+
+  function renderEdit(){
+    var e = $('edit'); e.innerHTML = '';
+    items.forEach(function(it){
+      var r = document.createElement('div'); r.className = 'r';
+      r.innerHTML = '<input type="text" value="' + esc(it.emoji) + '" style="width:48px;text-align:center" aria-label="emoji">' +
+        '<input type="text" value="' + esc(it.name) + '" style="flex:1;min-width:0" aria-label="name">' +
+        '<label style="font-size:13px;white-space:nowrap"><input type="checkbox"' + (it.active ? ' checked' : '') + '> on</label>' +
+        '<button class="secondary save">Save</button>';
+      var sel = document.createElement('select'); sel.style.width = '100%';
+      function fillSel(){
+        sel.innerHTML = '<option value="">Alert only (no Square stock)</option>';
+        if (it.square_variation_id && !(squareVariations || []).some(function(v){ return v.id === it.square_variation_id; })) { var o = document.createElement('option'); o.value = it.square_variation_id; o.textContent = 'Linked: ' + it.square_variation_id; o.selected = true; sel.appendChild(o); }
+        (squareVariations || []).forEach(function(v){ var o = document.createElement('option'); o.value = v.id; o.textContent = v.label; o.selected = v.id === it.square_variation_id; sel.appendChild(o); });
+      }
+      fillSel();
+      var wrap = document.createElement('div'); wrap.style.cssText = 'padding:0 0 8px'; wrap.appendChild(sel);
+      r.querySelector('.save').onclick = function(){
+        var ins = r.querySelectorAll('input[type=text]');
+        api('items', { id: it.id, emoji: ins[0].value.trim(), name: ins[1].value.trim(), active: r.querySelector('input[type=checkbox]').checked, square_variation_id: sel.value || null }, 'PUT')
+        .then(function(){ setMsg('editMsg', 'Saved.', 'ok'); refresh(); }).catch(function(e){ setMsg('editMsg', e.message, 'err'); });
+      };
+      e.appendChild(r); e.appendChild(wrap);
+    });
+  }
+
+  function refresh(){
+    return api('overview').then(function(j){
+      overview = j; items = j.items;
+      $('subs').textContent = j.subscribers + ' subscriber' + (j.subscribers === 1 ? '' : 's');
+      $('squareState').textContent = j.square_configured ? 'Square connected — "Fresh batch" sets the stock count, "Sold out" sets it to 0.' : 'Square access token not set yet — alerts send, but stock counts are skipped until it is.';
+      renderItems(); renderLog(); renderEdit();
+    });
+  }
+
+  function enter(){
+    $('gate').classList.add('hidden'); $('board').classList.remove('hidden');
+    refresh().catch(function(e){ if (e.status === 401) { key = null; try { localStorage.removeItem('fresh_staff_key'); } catch(x){} $('board').classList.add('hidden'); $('gate').classList.remove('hidden'); setMsg('gateMsg', 'Wrong passcode.', 'err'); } else setMsg('msg', e.message, 'err'); });
+    if (supported) navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE }).then(function(r){ reg = r; return r.pushManager.getSubscription(); }).then(function(s){ mySub = s; if (s) { $('meSub').textContent = 'Alerts on ✓'; $('meTest').disabled = false; } }).catch(function(){});
+  }
+
+  $('enter').onclick = function(){ key = $('pass').value.trim(); if (!key) return; try { localStorage.setItem('fresh_staff_key', key); } catch(e){} enter(); };
+  $('pass').addEventListener('keydown', function(ev){ if (ev.key === 'Enter') $('enter').onclick(); });
+  $('logout').onclick = function(ev){ ev.preventDefault(); try { localStorage.removeItem('fresh_staff_key'); } catch(e){} location.reload(); };
+  $('addItem').onclick = function(){ var name = prompt('Item name (plural, as it reads after a number — e.g. "Blueberry scones")'); if (!name) return; api('items', { name: name.trim(), emoji: '🔥', active: true }).then(function(){ refresh(); }).catch(function(e){ setMsg('editMsg', e.message, 'err'); }); };
+  $('loadSquare').onclick = function(){ setMsg('editMsg', 'Loading Square catalog…'); api('square/variations').then(function(j){ squareVariations = j.variations; renderEdit(); setMsg('editMsg', j.variations.length + ' Square variations loaded — pick one per item and Save.', 'ok'); }).catch(function(e){ setMsg('editMsg', e.message, 'err'); }); };
+  $('meSub').onclick = function(){
+    if (!supported) return setMsg('meMsg', 'This browser cannot receive push alerts.', 'err');
+    if (mySub) return setMsg('meMsg', 'Already on for this phone.', 'ok');
+    setMsg('meMsg', 'Asking for permission…');
+    Promise.resolve(Notification.requestPermission())
+    .then(function(p){ if (p !== 'granted') throw new Error('Permission not granted.'); return reg || navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE }); })
+    .then(function(r){ reg = r; return navigator.serviceWorker.ready; })
+    .then(function(){ return pub('vapid'); })
+    .then(function(j){ return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(j.key) }); })
+    .then(function(s){ mySub = s; return api('subscribe-staff', { subscription: s.toJSON(), ua: navigator.userAgent }); })
+    .then(function(){ $('meSub').textContent = 'Alerts on ✓'; $('meTest').disabled = false; setMsg('meMsg', 'This phone now gets every alert.', 'ok'); })
+    .catch(function(e){ setMsg('meMsg', e.message, 'err'); });
+  };
+  $('meTest').onclick = function(){ if (!mySub) return; setMsg('meMsg', 'Sending test…'); pub('test', { endpoint: mySub.endpoint }).then(function(){ setMsg('meMsg', 'Test sent.', 'ok'); }).catch(function(e){ setMsg('meMsg', e.message, 'err'); }); };
+
+  if (key) enter();
+})();
+</script>
+</body>
+</html>

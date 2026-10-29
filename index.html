@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fresh out of the oven · Apprentice Cafe</title>
+<meta name="theme-color" content="#414042">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Apprentice">
+<style>
+:root{--ink:#414042;--ink-2:#2f2e30;--cream:#ffefcf;--paper:#f6efe3;--line:#e3d9c7;--muted:#7a7470;--ember:#d8702a;--ok:#2f7d4f;--bad:#b4362f;--card:#ffffff}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+header.top{background:var(--ink);color:var(--cream);padding:calc(18px + env(safe-area-inset-top)) 20px 22px;text-align:center}
+header.top img{width:64px;height:64px;border-radius:16px;display:block;margin:0 auto 10px;box-shadow:0 2px 12px rgba(0,0,0,.35)}
+header.top h1{margin:0;font-size:22px;font-weight:600;letter-spacing:.02em}
+header.top p{margin:6px 0 0;color:#d9d2c3;font-size:14px}
+main{max-width:520px;margin:0 auto;padding:16px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.card h2{margin:0 0 6px;font-size:17px}
+.card p{margin:6px 0;color:#4d4945}
+.muted{color:var(--muted);font-size:14px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:14px 18px;background:var(--ink);color:var(--cream);font-weight:600;width:100%;font-size:17px}
+button.secondary{background:#efe7d7;color:var(--ink)}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.danger{background:#f6e2df;color:var(--bad)}
+button:disabled{opacity:.55;cursor:default}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.status{display:flex;align-items:center;gap:10px;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:#bbb;flex:none}.dot.on{background:var(--ok)}.dot.off{background:#b9b2a7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#fff;font-size:15px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+.chip.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+ol.steps{padding-left:22px;margin:8px 0 0}ol.steps li{margin:6px 0}
+ul.feed{list-style:none;padding:0;margin:8px 0 0}ul.feed li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line)}ul.feed li:first-child{border-top:0}
+ul.feed .when{color:var(--muted);font-size:14px;white-space:nowrap}
+.msg{margin-top:10px;font-size:14px;color:var(--muted);min-height:1em}
+.msg.err{color:var(--bad)}.msg.ok{color:var(--ok)}
+a.link{color:var(--ink);font-weight:600}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:10px 20px 30px}
+.hidden{display:none !important}
+.kbd{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;background:#fff;font-size:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <img src="./icon-192.png" alt="">
+  <h1>Fresh out of the oven</h1>
+  <p>Get a ping the moment a batch comes out at Apprentice. Tap it to order for pickup before it's gone.</p>
+</header>
+<main>
+  <section class="card" id="install" style="display:none">
+    <h2>One quick step on iPhone</h2>
+    <p>Apple only allows alerts from sites saved to your Home Screen.</p>
+    <ol class="steps">
+      <li>Tap the <strong>Share</strong> button in Safari (the square with the arrow).</li>
+      <li>Choose <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+      <li>Open <strong>Apprentice</strong> from your Home Screen and tap <em>Turn on alerts</em>.</li>
+    </ol>
+    <p class="muted" style="margin-top:10px">Not in Safari? Open this page in Safari first — other iPhone browsers can't add it.</p>
+  </section>
+
+  <section class="card" id="unsupported" style="display:none">
+    <h2>This browser can't receive alerts</h2>
+    <p>Try Chrome, Edge or Firefox on Android or desktop, or Safari on iPhone (iOS 16.4 or newer, saved to the Home Screen).</p>
+  </section>
+
+  <section class="card" id="main" style="display:none">
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">Alerts are off</span></div>
+    <p class="muted" id="statusHelp">Free, no account, nothing to install. Turn them off any time.</p>
+    <div id="subscribeWrap" style="margin-top:12px"><button id="subscribeBtn">Turn on alerts</button></div>
+    <div id="subscribedWrap" class="hidden" style="margin-top:12px">
+      <div class="row"><button class="secondary" id="testBtn">Send me a test</button><button class="ghost" id="unsubBtn">Turn off</button></div>
+    </div>
+    <div class="msg" id="msg"></div>
+  </section>
+
+  <section class="card" id="prefs" style="display:none">
+    <h2>What do you want to hear about?</h2>
+    <p class="muted">Everything by default. Pick favourites to only hear about those.</p>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="card">
+    <h2>Latest from the oven</h2>
+    <ul class="feed" id="feed"><li class="muted">Loading…</li></ul>
+    <div style="margin-top:12px"><a class="link" id="orderLink" href="#" target="_blank" rel="noopener">Order online for pickup →</a></div>
+  </section>
+</main>
+<footer>Apprentice Cafe · 1024 Bellevue Ave SE, Calgary<br>Takeaway only · Alerts come from this page, never spam. Turn them off here any time.</footer>
+<script>
+(function(){
+  var BASE = "./";
+  var API = "https://uzfaottkxdunmmimajey.supabase.co/functions/v1/fresh/";
+  var $ = function(id){ return document.getElementById(id); };
+  var ua = navigator.userAgent || '';
+  var isIOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  var supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  var items = [], selected = null, reg = null, sub = null, config = {};
+
+  function setMsg(t, cls){ var m = $('msg'); m.textContent = t || ''; m.className = 'msg' + (cls ? ' ' + cls : ''); }
+  function b64ToU8(s){ var pad = '='.repeat((4 - s.length % 4) % 4); var b = (s + pad).replace(/-/g,'+').replace(/_/g,'/'); var raw = atob(b); var out = new Uint8Array(raw.length); for (var i=0;i<raw.length;i++) out[i] = raw.charCodeAt(i); return out; }
+  function ago(iso){ var d = (Date.now() - new Date(iso).getTime())/1000; if (d < 60) return 'just now'; if (d < 3600) return Math.round(d/60) + ' min ago'; if (d < 86400) return Math.round(d/3600) + ' h ago'; var dd = Math.round(d/86400); return dd === 1 ? 'yesterday' : dd + ' days ago'; }
+  function api(path, body){ return fetch(API + 'api/' + path, body ? { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(body) } : {}).then(function(r){ return r.json().then(function(j){ if(!r.ok) throw new Error(j.error || ('HTTP ' + r.status)); return j; }); }); }
+
+  function renderChips(){
+    var c = $('chips'); c.innerHTML = '';
+    var all = document.createElement('div'); all.className = 'chip' + (selected === null ? ' on' : ''); all.textContent = '✨ Everything';
+    all.onclick = function(){ selected = null; renderChips(); savePrefs(); };
+    c.appendChild(all);
+    items.forEach(function(it){
+      var el = document.createElement('div'); el.className = 'chip' + (selected && selected.indexOf(it.id) >= 0 ? ' on' : '');
+      el.textContent = (it.emoji ? it.emoji + ' ' : '') + it.name;
+      el.onclick = function(){
+        if (selected === null) selected = [it.id];
+        else if (selected.indexOf(it.id) >= 0) { selected = selected.filter(function(x){ return x !== it.id; }); if (!selected.length) selected = null; }
+        else selected.push(it.id);
+        renderChips(); savePrefs();
+      };
+      c.appendChild(el);
+    });
+    try { localStorage.setItem('fresh_prefs', JSON.stringify(selected)); } catch(e){}
+  }
+  var saveTimer = null;
+  function savePrefs(){ if (!sub) return; clearTimeout(saveTimer); saveTimer = setTimeout(function(){ api('subscribe', { subscription: sub.toJSON(), items: selected, ua: ua }).then(function(){ setMsg('Preferences saved.', 'ok'); }).catch(function(e){ setMsg('Could not save preferences: ' + e.message, 'err'); }); }, 400); }
+
+  function showSubscribed(on){
+    $('dot').className = 'dot ' + (on ? 'on' : 'off');
+    $('statusText').textContent = on ? "You're on the list" : 'Alerts are off';
+    $('statusHelp').textContent = on ? "We'll ping this device when a batch comes out. Pick favourites below if you like." : 'Free, no account, nothing to install. Turn them off any time.';
+    $('subscribeWrap').classList.toggle('hidden', on);
+    $('subscribedWrap').classList.toggle('hidden', !on);
+  }
+
+  function loadFeed(){
+    api('recent').then(function(j){
+      var f = $('feed'); f.innerHTML = '';
+      if (!j.alerts.length) { f.innerHTML = '<li class="muted">Nothing announced yet — the first batch alert will show up here.</li>'; return; }
+      j.alerts.forEach(function(a){
+        var li = document.createElement('li');
+        var left = document.createElement('span'); left.textContent = (a.emoji ? a.emoji + ' ' : '') + (a.quantity ? a.quantity + ' ' : '') + a.item_name + (a.kind === 'sold_out' ? ' — sold out' : '');
+        var right = document.createElement('span'); right.className = 'when'; right.textContent = ago(a.created_at);
+        li.appendChild(left); li.appendChild(right); f.appendChild(li);
+      });
+    }).catch(function(){ $('feed').innerHTML = '<li class="muted">Could not load recent alerts.</li>'; });
+  }
+
+  function init(){
+    api('items').then(function(j){
+      items = j.items; config = j.config || {};
+      if (config.order_url) $('orderLink').href = config.order_url;
+      try { var p = JSON.parse(localStorage.getItem('fresh_prefs') || 'null'); if (Array.isArray(p)) selected = p.filter(function(id){ return items.some(function(it){ return it.id === id; }); }); if (selected && !selected.length) selected = null; } catch(e){}
+      renderChips();
+    });
+    loadFeed();
+
+    if (!supported) {
+      if (isIOS && !standalone) { $('install').style.display = ''; } else { $('unsupported').style.display = ''; }
+      return;
+    }
+    if (isIOS && !standalone) { $('install').style.display = ''; }
+    $('main').style.display = ''; $('prefs').style.display = '';
+
+    navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE }).then(function(r){
+      reg = r; return r.pushManager.getSubscription();
+    }).then(function(s){
+      sub = s;
+      if (s) { showSubscribed(true); api('subscribe', { subscription: s.toJSON(), items: selected, ua: ua }).catch(function(){}); }
+      else showSubscribed(false);
+    }).catch(function(e){ setMsg('Could not start: ' + e.message, 'err'); });
+
+    $('subscribeBtn').onclick = function(){
+      var btn = $('subscribeBtn'); btn.disabled = true; setMsg('Asking your browser for permission…');
+      // Permission prompt first, inside the tap, so iOS/Firefox treat it as user-initiated.
+      Promise.resolve(Notification.requestPermission())
+      .then(function(perm){
+        if (perm !== 'granted') throw new Error(perm === 'denied' ? 'Notifications are blocked for this site. Allow them in your browser settings and try again.' : 'Permission was not granted.');
+        return reg || navigator.serviceWorker.register(BASE + 'sw.js', { scope: BASE });
+      })
+      .then(function(r){ reg = r; return navigator.serviceWorker.ready; })
+      .then(function(){ return api('vapid'); })
+      .then(function(j){ return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(j.key) }); })
+      .then(function(s){ sub = s; return api('subscribe', { subscription: s.toJSON(), items: selected, ua: ua }); })
+      .then(function(){ showSubscribed(true); setMsg("Done. You'll get a notification when the next batch comes out.", 'ok'); })
+      .catch(function(e){ setMsg(e.message || String(e), 'err'); })
+      .then(function(){ btn.disabled = false; });
+    };
+    $('unsubBtn').onclick = function(){
+      if (!sub) return showSubscribed(false);
+      var ep = sub.endpoint;
+      sub.unsubscribe().catch(function(){}).then(function(){ return api('unsubscribe', { endpoint: ep }); }).catch(function(){})
+      .then(function(){ sub = null; showSubscribed(false); setMsg('Alerts are off for this device.'); });
+    };
+    $('testBtn').onclick = function(){
+      if (!sub) return;
+      $('testBtn').disabled = true; setMsg('Sending a test…');
+      api('test', { endpoint: sub.endpoint }).then(function(){ setMsg('Test sent — it should pop up in a few seconds. (On iPhone, check that notifications are allowed for "Apprentice" in Settings if nothing shows.)', 'ok'); })
+      .catch(function(e){ setMsg('Test failed: ' + e.message, 'err'); })
+      .then(function(){ setTimeout(function(){ $('testBtn').disabled = false; }, 15000); });
+    };
+  }
+  init();
+})();
+</script>
+</body>
+</html>
